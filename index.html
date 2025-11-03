@@ -1,296 +1,373 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Broccoli FM — Live</title>
-  <style>
-    :root{
-      --bg:#faf7f0;
-      --ink:#1e1e1e;
-      --accent:#4caf50;
-      --accent-2:#2f855a;
-      --card:#ffffff;
-      --muted:#666;
-      --shadow:0 6px 18px rgba(0,0,0,.08);
-      --radius:14px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-      color:var(--ink);
-      background:linear-gradient(180deg,#fff, var(--bg) 120vh);
-    }
-    a{color:var(--accent-2); text-decoration:none}
-    header{
-      position:sticky; top:0; z-index:10;
-      background:#ffffffcc; backdrop-filter: blur(10px);
-      border-bottom:1px solid #eee;
-    }
-    .wrap{max-width:1100px; margin:auto; padding:24px}
-    .row{display:grid; gap:24px}
-    .brand{
-      display:flex; align-items:center; gap:14px;
-    }
-    .brand h1{font-size:28px; margin:0}
-    .pill{
-      font-size:12px; color:#fff; background:var(--accent-2);
-      padding:6px 10px; border-radius:999px; letter-spacing:.04em
-    }
-    /* hero */
-    .hero{
-      display:grid; gap:22px; grid-template-columns: 1.2fr .8fr;
-      align-items:stretch; margin-top:18px;
-    }
-    .panel{
-      background:var(--card); border:1px solid #eee; border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
-    .panel .inner{padding:22px}
-    .now{
-      display:flex; align-items:center; gap:16px;
-    }
-    .cover{
-      width:90px; height:90px; border-radius:12px; flex:0 0 auto;
-      background:#e7f6ea; display:grid; place-items:center; font-size:38px;
-      border:1px solid #dfeee3;
-    }
-    .track h2{margin:0 0 4px; font-size:20px}
-    .track p{margin:0; color:var(--muted)}
-    audio{width:100%; margin-top:14px}
-    .ticker{
-      margin-top:12px; font-size:14px; color:var(--muted);
-      white-space:nowrap; overflow:hidden;
-    }
-    .ticker span{
-      display:inline-block; padding-left:100%;
-      animation:slide 22s linear infinite;
-    }
-    @keyframes slide { from{transform:translateX(0)} to{transform:translateX(-100%)} }n
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Broccoli FM — Garden Radio (Live)</title>
+<meta name="description" content="Broccoli FM — Plants, beats & quiet joy. A calm garden radio with a live player and chat." />
 
-    /* side bits */
-    .bits{display:grid; gap:16px}
-    .bit{padding:16px; border:1px dashed #e0e0e0; border-radius:12px; background:#fff}
-    .bit h3{margin:0 0 6px; font-size:14px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-2)}
-    .quote{font-style:italic; margin:0}
+<!-- Fonts: refined serif + relaxed script + clean UI -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Caveat:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
-    /* sections */
-    .grid{display:grid; gap:24px; grid-template-columns: repeat(3, 1fr)}
-    .card{background:#fff; border:1px solid #eee; border-radius:12px; box-shadow:var(--shadow)}
-    .card .inner{padding:18px}
-    .card h3{margin:0 0 10px}
-    .tag{font-size:12px; color:#fff; background:var(--accent); border-radius:999px; padding:4px 8px}
+<style>
+/* ============= THEME (earthy soil & veg palette) ============= */
+:root{
+  --paper:#F5EEDD;     /* chalk cream */
+  --ink:#2E3A4B;       /* midnight blue for text/lines */
+  --soil:#6B4E36;      /* soil brown */
+  --terra:#D9A76A;     /* terracotta */
+  --leaf:#8A9A6D;      /* sage green */
+  --beet:#A74C47;      /* beetroot red */
+  --wash1:#efe5cf;     /* background watercolor */
+  --wash2:#e2d9c2;
+  --rule:#E8DDC9;
+  --card:#fffdf6;
+  --max:1100px;
+  --radius:18px;
+  --shadow:0 14px 36px rgba(0,0,0,.08);
+}
 
-    /* chat */
-    .chat{
-      display:grid; grid-template-rows:auto 1fr auto; height:520px;
-    }
-    .messages{
-      padding:16px; overflow:auto; border-top:1px solid #f2f2f2; border-bottom:1px solid #f2f2f2;
-      background: #fcfcfc;
-    }
-    .msg{
-      display:grid; gap:4px; margin:10px 0; max-width:85%;
-      padding:12px; background:#fff; border:1px solid #eee; border-radius:12px;
-      box-shadow:var(--shadow);
-    }
-    .me{margin-left:auto; background:#eef9f0; border-color:#d8f0dd}
-    .bot{border-left:4px solid var(--accent)}
-    .meta{font-size:12px; color:var(--muted)}
-    form.chatbar{
-      display:flex; gap:10px; padding:12px; background:#fff; border-radius:0 0 12px 12px;
-    }
-    .chatbar input[type="text"]{
-      flex:1; padding:12px 14px; border:1px solid #ddd; border-radius:10px; font-size:15px
-    }
-    .chatbar button{
-      padding:12px 16px; border:0; border-radius:10px; background:var(--accent); color:#fff; font-weight:600; cursor:pointer
-    }
-    .muted{color:var(--muted)}
-    footer{padding:40px 0; text-align:center; color:var(--muted)}
-    /* responsive */
-    @media (max-width: 920px){
-      .hero{grid-template-columns:1fr}
-      .grid{grid-template-columns:1fr}
-    }
-  </style>
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; color:var(--ink); background:var(--paper);
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  line-height:1.55; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+
+/* Painterly paper wash */
+body::before{
+  content:""; position:fixed; inset:0; z-index:-1;
+  background:
+    radial-gradient(900px 600px at 15% 8%, rgba(167,76,71,.10), transparent 60%),
+    radial-gradient(1000px 600px at 80% 15%, rgba(138,154,109,.12), transparent 60%),
+    radial-gradient(900px 500px at 50% 78%, rgba(217,167,106,.14), transparent 60%),
+    linear-gradient(180deg, var(--wash1), var(--wash2));
+  filter:saturate(105%);
+}
+
+/* Layout helpers */
+.wrap{max-width:var(--max); margin:0 auto; padding:24px 20px}
+.section{margin-top:26px}
+
+/* Header (inspired by Worldwide FM: strip + nav + now playing feel) */
+header{
+  position:sticky; top:0; z-index:20;
+  background:color-mix(in oklab, var(--paper) 85%, white 15%);
+  border-bottom:1px solid var(--rule); backdrop-filter:blur(6px);
+}
+.brand{display:flex; align-items:center; justify-content:space-between; gap:16px}
+.logo{
+  font-family:"Playfair Display", Georgia, serif; font-weight:600; letter-spacing:.02em;
+  font-size:clamp(26px,4vw,38px)
+}
+nav a{
+  color:var(--ink); text-decoration:none; font-weight:600; letter-spacing:.06em;
+  text-transform:uppercase; font-size:13px; padding:8px 10px; border-radius:999px;
+  border:1px solid transparent;
+}
+nav a:hover{border-color: color-mix(in oklab, var(--ink) 18%, transparent)}
+.live-badge{
+  display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px;
+  background: rgba(167,76,71,.10); border:1px solid color-mix(in oklab, var(--beet) 45%, white);
+  font-size:12px; font-weight:600; color:var(--beet)
+}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--beet);box-shadow:0 0 0 4px rgba(167,76,71,.18)}
+
+/* Hero grid: Now playing left, schedule/quote right */
+.grid{
+  display:grid; gap:24px;
+  grid-template-columns:1.2fr .8fr;
+}
+@media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+
+.card{
+  border:1px solid var(--rule); background:var(--card);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+}
+.inner{padding:22px}
+
+.eyebrow{
+  text-transform:uppercase; letter-spacing:.18em; font-size:12px; color:var(--soil)
+}
+h1{
+  font-family:"Playfair Display", Georgia, serif; font-weight:600; line-height:1.04;
+  margin:10px 0 6px; font-size:clamp(34px,6vw,62px)
+}
+.script{font-family:"Caveat", cursive; font-size:clamp(22px,3vw,30px)}
+.sub{color:#6f6a60}
+
+/* Player block */
+.now{
+  display:flex; gap:16px; align-items:center; margin:10px 0 12px
+}
+.playmark{
+  width:64px; height:64px; border-radius:50%; flex:0 0 auto;
+  background: conic-gradient(from 0deg, rgba(138,154,109,.20), rgba(217,167,106,.22));
+  border:2px solid color-mix(in oklab, var(--leaf) 35%, var(--terra) 65%);
+  display:grid; place-items:center; box-shadow: inset 0 0 0 7px rgba(255,255,255,.6);
+}
+.playmark svg{opacity:.9}
+.track h2{margin:0 0 4px; font-size:22px}
+.meta{color:#877d72; font-size:14px}
+audio{width:100%; margin-top:10px; accent-color:var(--leaf)}
+.marquee{
+  margin-top:10px; font-size:14px; color:#6e6b64; white-space:nowrap; overflow:hidden
+}
+.marquee span{display:inline-block; padding-left:100%; animation:marq 26s linear infinite}
+@keyframes marq{ to{ transform:translateX(-100%)} }
+.pill{display:inline-block; padding:3px 8px; border-radius:999px; font-size:12px;
+  background:rgba(138,154,109,.15); border:1px solid rgba(138,154,109,.35); }
+
+/* Show list / schedule */
+.list{list-style:none; padding:0; margin:0}
+.list li{padding:10px 0; border-bottom:1px dashed var(--rule)}
+.note{font-size:14px; color:#6e6b64}
+.divider{border:0; border-top:1px solid var(--rule); margin:26px 0}
+
+/* Quote (painterly frame) */
+.quote{border:1px solid var(--rule); border-radius:14px; background:#fffdfa}
+.quote .q{font-family:"Caveat", cursive; font-size:28px}
+
+/* Featured shows cards (simple placeholders) */
+.shows{display:grid; gap:16px; grid-template-columns:repeat(3, 1fr)}
+@media (max-width: 980px){ .shows{grid-template-columns:1fr} }
+.show{
+  padding:16px; border:1px solid var(--rule); border-radius:12px; background:#fffef8;
+}
+
+/* Chat */
+#chat.card{margin-top:24px}
+.chat{
+  display:grid; grid-template-rows:auto 1fr auto; height:520px;
+}
+.messages{
+  padding:14px; overflow:auto; background:linear-gradient(180deg, #fffef9, #fffdfa);
+  border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
+}
+.msg{margin:10px 0; max-width:80%}
+.bubble{
+  display:inline-block; padding:10px 14px; border-radius:16px;
+  background:#fffdf6; border:1px solid var(--rule); box-shadow:var(--shadow)
+}
+.me .bubble{ background: color-mix(in oklab, var(--leaf) 14%, white 86%);
+  border-color: color-mix(in oklab, var(--leaf) 45%, white) }
+.bot .bubble{ border-left:4px solid var(--terra) }
+.who{font-weight:600; font-size:13px; margin-bottom:2px; color:var(--soil)}
+.time{font-size:11px; color:#9a8f80; margin-left:6px}
+.chatbar{display:flex; gap:10px; padding:12px; background:var(--card);
+  border-radius:0 0 var(--radius) var(--radius)}
+.chatbar input{
+  flex:1; padding:14px 16px; border:1px solid var(--rule); border-radius:12px; font-size:16px
+}
+.chatbar button{
+  padding:14px 18px; border:0; border-radius:12px; font-weight:600; cursor:pointer; color:white;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--beet) 60%, var(--terra)), var(--beet))
+}
+
+/* Footer */
+footer{padding:42px 0 70px; text-align:center; color:#7a7468}
+.small{font-size:13px}
+</style>
 </head>
 <body>
-  <header>
-    <div class="wrap row">
-      <div class="brand">
-        <div style="font-size:28px">🥦</div>
-        <h1>Broccoli FM</h1>
-        <span class="pill">Live</span>
+
+<header>
+  <div class="wrap brand">
+    <div class="logo">BROCCOLI&nbsp;FM</div>
+    <nav>
+      <a href="#listen">Listen</a>
+      <a href="#shows">Shows</a>
+      <a href="#chat">Chat</a>
+      <span class="live-badge"><span class="live-dot"></span> Live</span>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- HERO: NOW PLAYING + SCHEDULE / QUOTE -->
+  <section id="listen" class="grid">
+    <!-- Now Playing -->
+    <article class="card">
+      <div class="inner">
+        <div class="eyebrow">Now Playing</div>
+        <h1 class="script">Plants, Beats & Quiet Joy.</h1>
+
+        <div class="now">
+          <div class="playmark" title="Play">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="7,5 19,12 7,19"></polygon>
+            </svg>
+          </div>
+          <div class="track">
+            <h2 id="track">Morning Garden Session</h2>
+            <div class="meta">with DJ Snail · <span class="pill">On Air</span></div>
+            <audio id="player" controls preload="none">
+              <!-- ⬇️ Put your live stream URL here (Icecast/Shoutcast/HLS) -->
+              <source src="AUDIO_STREAM_URL_HERE" type="audio/mpeg">
+            </audio>
+          </div>
+        </div>
+
+        <div class="marquee">
+          <span>Now playing: “Sprout Symphony” · Next: “Watering Can Waltz” · New episode Friday · Quote from the Garden at :45 • </span>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Shows list (like Worldwide FM list column) -->
+        <div id="shows">
+          <div class="eyebrow">Shows</div>
+          <ul class="list">
+            <li><strong>Greenhouse Grooves</strong> — <em>Cullivar</em> <span class="pill">Live</span></li>
+            <li><strong>Harvest Harmonies</strong> — <em>Hortense</em></li>
+            <li><strong>Songs for Sprouts</strong> — <em>Alan Seedling</em></li>
+            <li><strong>Underground Tracks</strong> — <em>The Compostist</em></li>
+          </ul>
+          <p class="note" style="margin-top:8px">Broadcast from the greenhouse studio, London.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Right column: Quote + Schedule -->
+    <aside class="section">
+      <div class="card quote" style="margin-bottom:16px">
+        <div class="inner">
+          <div class="eyebrow">Quote from the Garden</div>
+          <div class="q" id="quote">“Grow slow, grow strong.”</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="inner">
+          <div class="eyebrow">Today’s Schedule</div>
+          <ul class="list">
+            <li><strong>08:00</strong> — Morning Garden Session <span class="pill">Live</span></li>
+            <li><strong>09:15</strong> — Listener Picks</li>
+            <li><strong>10:45</strong> — Quote from the Garden</li>
+          </ul>
+          <p class="note" style="margin-top:10px">Message <strong>@DJ Snail</strong> in the chat.</p>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- Featured (simple static placeholders to mirror WWFM sections) -->
+  <section class="section">
+    <div class="eyebrow">Featured</div>
+    <div class="shows">
+      <div class="show">
+        <strong>Shade & Lo-Fi</strong>
+        <p class="note">A cool hour under the fig tree.</p>
+      </div>
+      <div class="show">
+        <strong>Watering Can Waltz</strong>
+        <p class="note">Slow rhythms for slow growers.</p>
+      </div>
+      <div class="show">
+        <strong>Mushroom Hour</strong>
+        <p class="note">Underground selections & spores.</p>
       </div>
     </div>
-  </header>
+  </section>
 
-  <main class="wrap">
-    <!-- HERO: Player + Bits -->
-    <section class="hero">
-      <div class="panel">
-        <div class="inner">
-          <div class="now">
-            <div class="cover">📻</div>
-            <div class="track">
-              <h2 id="track-title">Morning Garden Session</h2>
-              <p class="muted">with DJ Snail · Live Broadcast</p>
-              <audio id="player" controls>
-                <!-- Replace with your streaming URL (e.g. icecast / shoutcast) -->
-                <source src="" type="audio/mpeg">
-              </audio>
-            </div>
-          </div>
-          <div class="ticker" aria-live="polite">
-            <span>Now playing: “Sprout Symphony” · Next up: “Watering Can Waltz” · New episode drops every Friday · Quote from the Garden at :45 past the hour • </span>
-          </div>
-        </div>
+  <!-- CHAT (same page) -->
+  <section id="chat" class="card section">
+    <div class="inner chat" aria-live="polite">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <h2 style="margin:0; font-family:'Playfair Display',serif">Live Chat</h2>
+        <div class="note" id="who"></div>
       </div>
 
-      <aside class="bits">
-        <div class="bit">
-          <h3>New Episode</h3>
-          <div class="muted">“Quote from the Garden”</div>
-          <div>Every Friday 10:00</div>
-        </div>
-        <div class="bit">
-          <h3>Now Playing</h3>
-          <div class="muted" id="np-mini">Sprout Symphony — DJ Snail</div>
-        </div>
-        <div class="bit">
-          <h3>Quote</h3>
-          <p class="quote" id="quote">“Grow slow, grow strong.”</p>
-        </div>
-      </aside>
-    </section>
+      <div id="messages" class="messages" role="log" aria-label="Chat messages"></div>
 
-    <!-- Content + Chat -->
-    <section style="margin-top:28px" class="grid">
-      <div class="card">
-        <div class="inner">
-          <h3>About the Station</h3>
-          <p>Welcome to <strong>Broccoli FM</strong>—plants, beats, and breezes. Stream the show, browse recent episodes, or say hi in the chat.</p>
-          <ul class="muted">
-            <li>Live weekdays · 8–11 AM</li>
-            <li>Rebroadcast · 6–8 PM</li>
-            <li>Studio: Greenhouse A</li>
-          </ul>
-        </div>
-      </div>
+      <form id="chat-form" class="chatbar" autocomplete="off">
+        <input id="chat-input" type="text" placeholder="Say something kind…" aria-label="Chat message" required />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </section>
+</main>
 
-      <div class="card">
-        <div class="inner">
-          <h3>Today’s Schedule</h3>
-          <p><span class="tag">Live</span> 08:00 — Morning Garden Session</p>
-          <p>09:15 — Listener Picks</p>
-          <p>10:45 — Quote from the Garden</p>
-          <p>11:00 — Live ends</p>
-        </div>
-      </div>
+<footer>
+  <div class="small">© <span id="year"></span> Broccoli FM — Plants, Beats & Quiet Joy.</div>
+</footer>
 
-      <!-- Chat panel -->
-      <div class="card">
-        <div class="inner chat" aria-live="polite">
-          <div style="display:flex; align-items:center; justify-content:space-between">
-            <h3 style="margin:0">Live Chat</h3>
-            <div class="muted" id="who"></div>
-          </div>
-          <div id="messages" class="messages" role="log" aria-label="Chat messages"></div>
-          <form id="chat-form" class="chatbar" autocomplete="off">
-            <input id="chat-input" type="text" placeholder="Say something nice…" aria-label="Chat message" required />
-            <button type="submit">Send</button>
-          </form>
-        </div>
-      </div>
-    </section>
-  </main>
+<script>
+/* ========= Tiny front-end behavior ========= */
 
-  <footer>
-    © <span id="year"></span> Broccoli FM · Made with 🌱
-  </footer>
+// Rotate track title (demo feel)
+const titles = ["Morning Garden Session","Sprout Symphony","Watering Can Waltz","Shade & Lo-Fi"];
+setInterval(()=> {
+  const t = titles[Math.floor(Math.random()*titles.length)];
+  document.getElementById('track').textContent = t;
+}, 18000);
 
-  <script>
-    // ----- demo data -----
-    const quotes = [
-      "“Grow slow, grow strong.”",
-      "“Sunlight is free. Use it.”",
-      "“Water your ideas.”",
-      "“Patience is a superpower.”"
-    ];
+// Rotate quote
+const quotes = [
+  "“Grow slow, grow strong.”",
+  "“Sunlight is free. Use it.”",
+  "“Water your ideas.”",
+  "“Patience is a superpower.”"
+];
+setInterval(()=>{
+  document.getElementById('quote').textContent = quotes[Math.floor(Math.random()*quotes.length)];
+}, 15000);
 
-    // ----- basic player helpers (mock) -----
-    const trackTitle = document.getElementById('track-title');
-    const mini = document.getElementById('np-mini');
-    setInterval(()=>{
-      const titles = ["Morning Garden Session","Sprout Symphony","Watering Can Waltz","Shade & Lo-Fi"];
-      const pick = titles[Math.floor(Math.random()*titles.length)];
-      trackTitle.textContent = pick;
-      mini.textContent = pick + " — DJ Snail";
-    }, 18000);
+// Simple local chat (replace with WebSocket/Firebase later)
+const who = document.getElementById('who');
+const me = localStorage.getItem('bfm_name') || prompt("Choose a chat name:", "GardenGuest");
+localStorage.setItem('bfm_name', me);
+who.textContent = "Signed in as " + me;
 
-    // ----- rotating quote -----
-    const q = document.getElementById('quote');
-    setInterval(()=>{
-      q.textContent = quotes[Math.floor(Math.random()*quotes.length)];
-    }, 15000);
+const log = document.getElementById('messages');
+function escapeHtml(str){
+  return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function addMsg(author, text, cls=""){
+  const row = document.createElement('div');
+  row.className = 'msg ' + cls;
+  const now = new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+  row.innerHTML = `
+    <div class="who">${author}<span class="time">· ${now}</span></div>
+    <div class="bubble">${escapeHtml(text)}</div>`;
+  log.appendChild(row);
+  log.scrollTop = log.scrollHeight;
+}
 
-    // ----- local chat (mock) -----
-    const who = document.getElementById('who');
-    const me = localStorage.getItem('broccoliUser') || prompt("Choose a chat name:", "GardenGuest");
-    localStorage.setItem('broccoliUser', me);
-    who.textContent = "Signed in as " + me;
+// seed
+addMsg('DJ Snail','Welcome to the garden. Keep it kind.','bot');
 
-    const log = document.getElementById('messages');
-    function addMsg(author, text, type="user"){
-      const wrap = document.createElement('div');
-      wrap.className = 'msg ' + (author===me ? 'me' : (type==='bot' ? 'bot' : ''));
-      wrap.innerHTML = `
-        <div><strong>${author}</strong></div>
-        <div>${escapeHtml(text)}</div>
-        <div class="meta">${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>`;
-      log.appendChild(wrap);
-      log.scrollTop = log.scrollHeight;
-    }
-    function escapeHtml(str){
-      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
+function botReply(){
+  const r = ["Appreciate you tuning in 🌿","Request noted ✅","Leaf the volume right there 😌","Hydrate & vibe."];
+  setTimeout(()=> addMsg('DJ Snail', r[Math.floor(Math.random()*r.length)], 'bot'), 800);
+}
 
-    // Seed with a couple messages
-    addMsg('DJ Snail','Welcome to Broccoli FM 🌿 Say hi!','bot');
+document.getElementById('chat-form').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const inp = document.getElementById('chat-input');
+  const txt = inp.value.trim();
+  if(!txt) return;
+  addMsg(me, txt, 'me');
+  botReply();
+  inp.value = '';
+  inp.focus();
+});
 
-    // fake bot replies
-    function botReply(userText){
-      const replies = [
-        "Love that!",
-        "Shoutout logged ✅",
-        "Turn it up just a leaf 🍃",
-        "Hydrate & vibe 😌"
-      ];
-      setTimeout(()=> addMsg('DJ Snail', replies[Math.floor(Math.random()*replies.length)], 'bot'), 800);
-    }
+document.getElementById('year').textContent = new Date().getFullYear();
 
-    document.getElementById('chat-form').addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const inp = document.getElementById('chat-input');
-      const txt = inp.value.trim();
-      if(!txt) return;
-      addMsg(me, txt);
-      botReply(txt);
-      inp.value = '';
-      inp.focus();
-    });
-
-    // Footer year
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // ---- Notes to integrate a real chat later ----
-    // Replace addMsg()/botReply() with a WebSocket or your favorite service (Ably, Firebase, Supabase, Socket.IO).
-    // Example shape:
-    // ws = new WebSocket("wss://your-chat-server");
-    // ws.onmessage = (e)=> { const {author,text} = JSON.parse(e.data); addMsg(author, text); }
-    // ws.onopen = ()=> ws.send(JSON.stringify({type:"join", name: me}));
-  </script>
+/* ====== Hook up a real chat later (example) ======
+   const ws = new WebSocket("wss://your-chat-server");
+   ws.onmessage = (e)=> { const {author,text} = JSON.parse(e.data); addMsg(author, text); };
+   ws.onopen = ()=> ws.send(JSON.stringify({type:"join", name: me}));
+   document.getElementById('chat-form').onsubmit = (e)=> {
+     e.preventDefault();
+     const txt = chatInput.value.trim();
+     if(!txt) return;
+     ws.send(JSON.stringify({author:me, text:txt}));
+     chatInput.value = "";
+   };
+==================================================== */
+</script>
 </body>
 </html>
